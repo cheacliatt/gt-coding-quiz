@@ -85,33 +85,41 @@ function generateQuestion() {
 }
 
 function endGame() {
-  quizArea.innerHTML = "";
+  // quizArea.innerHTML = "";
   var finalScreen = document.createElement("h4");
   finalScreen.textContent = "Hey, you got this far. Congrats kid.";
   quizArea.append(finalScreen);
 }
+
+
+// quiz.addEventListener("click", function () {
+//   questionIndex++;
+//   generateQuestion();
+// });
+
+quizArea.addEventListener("click", function (event) {
+  event.preventDefault();
+  var answers = arrayOfQuestions[questionIndex].answer
+  if (event.target.matches(".choice-button")) {
+    questionIndex++;
+    generateQuestion();
+    if (event.target.textContent !== answers) {
+      secondsLeft = secondsLeft - 10;
+      responseEl.innerHTML = "incorrect";
+      // questionIndex++;
+    } else {
+      responseEl.innerHTML = "correct";
+      // questionIndex++;
+    }
+  }
+});
+
 
 // quizArea.addEventListener("click", function(event) {;
 //   if(event.target.matches("button")){;
 //   }
 // });
 
-quiz.addEventListener("click", function () {
-  questionIndex++;
-  generateQuestion();
-});
-
-quizArea.addEventListener("click", function (event) {
-  event.preventDefault();
-  if (event.target.matches(".choice-button")) {
-    if (event.target.textContent != arrayOfQuestions[questionIndex].answer) {
-      secondsLeft = secondsLeft - 10;
-      responseEl.textContent = "incorrect";
-    } else {
-      responseEl.textContent = "correct";
-    }
-  }
-});
 
 // function incorrectAnswer() {
 //   // cycles through buttons with the class "incorrect" and add event listners to those buttons
