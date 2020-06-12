@@ -1,10 +1,21 @@
-var secondsLeft = 75;
+var startGameEl = document.querySelector("#startGame");
 var timeEl = document.querySelector("#timer");
-var startGame = document.querySelector("#startGame");
-var quizMain = document.querySelector("#quizMain");
-var quizArea = document.querySelector("#quiz");
-var responseEl = document.querySelector("#response");
+var mainMenuEl = document.querySelector("#main-menu");
+var quizAreaEl = document.querySelector("#quiz-area");
+var resultAreaEl = document.querySelector("#result-area");
+var questionEl = document.querySelector("#question");
+var selectionsEl = document.querySelector("#selections");
+var scoreAreaEl = document.querySelector("#score-area");
+var finalScoreAreaEl = document.querySelector("#final-score-area");
+var showResultEl = document.querySelector("#show-result");
+var scoreSubmitEl = document.querySelector("#score-submit");
+var initialSubmitEl = document.querySelector("#initial-submit");
+var savedHighScores = [];
+var secondsLeft = 75;
+var timerInterval;
 
+// This array of questions and answers is what will be the content of the webpage.
+var questionIndex = 0;
 var arrayOfQuestions = [
   {
     question: "Commonly Used data types DO NOT Include:",
@@ -39,97 +50,81 @@ var arrayOfQuestions = [
     answer: "console.log",
   },
 ];
-
-function setTime() {
-  startGame.addEventListener("click", function () {
-    generateQuestion();
-    quizMain.style.display = "none";
-    var timerInterval = setInterval(function () {
-      secondsLeft--;
-      timeEl.textContent = secondsLeft;
-
-      if (secondsLeft === 0) {
-        clearInterval(timerInterval);
-      }
-    }, 1000);
-  });
+// This begins the timer placed in the header and generates the first question.
+function startGameTimer() {
+  mainMenuEl.style.display = "none";
+  quizAreaEl.style.display = "block";
+  timerInterval = setInterval(function () {
+    secondsLeft--;
+    timeEl.textContent = "Time: " + secondsLeft;
+  }, 1000);
+  questionGenerator();
 }
-
-setTime();
-
-// The following function will create the HTML elements and fill them with content from our Array of Objects.
-var questionIndex = 0;
-
-function generateQuestion() {
-  //This clears any HTML as it cycles arrays.
-  quizArea.innerHTML = "";
-  // Question creator
-  var questionEl = document.createElement("h3");
+// This function generates the array of questions based on which value the index is set to, which cycles on each button press. It dynamically generates the HTML elements onot the webpage.
+function questionGenerator() {
+  var currentQuestionIndex = arrayOfQuestions[questionIndex];
+  console.log(arrayOfQuestions[questionIndex].question);
+  console.log(arrayOfQuestions[questionIndex].selections);
   questionEl.textContent = arrayOfQuestions[questionIndex].question;
-  quizArea.append(questionEl);
-  // Answer choices section, this is just creating the unordered list to append into.
-  var selectionList = document.createElement("ul");
-  selectionList.textContent = "";
-  quizArea.append(selectionList);
-  // This fills our unordered list with the choices object, then sets their attributes to Bootstrap buttons.
-  for (var i = 0; i < 4; i++) {
-    var choiceEl = document.createElement("li");
-    choiceEl.textContent = arrayOfQuestions[questionIndex].selections[i];
-    choiceEl.setAttribute("type", "button");
-    choiceEl.setAttribute("class", "btn btn-primary choice-button");
-    selectionList.append(choiceEl);
+  for (var i = 0; i < currentQuestionIndex.selections.length; i++) {
+    var selectionsList = document.createElement("li");
+    document.querySelector(".selections").append(selectionsList);
+    var choiceButtons = document.createElement("button");
+    selectionsList.append(choiceButtons);
+    choiceButtons.setAttribute("class", "btn btn-primary");
+    choiceButtons.textContent = currentQuestionIndex.selections[i];
+    choiceButtons.addEventListener("click", showResults);
   }
-  if(arrayOfQuestions[questionIndex] === 5) {
-    endGame();
+}
+// This function does two things: it increases the index of questions, cycling to the next page; once it is complete, it will make the final score page appear.
+function showResults(e) {
+  checkResult(e.target.textContent);
+  document.getElementById("question").innerHTML = "";
+  document.querySelector(".selections").innerHTML = "";
+  questionIndex++;
+  if (questionIndex === arrayOfQuestions.length) {
+    quizAreaEl.style.display = "none";
+    resultAreaEl.style.display = "none";
+    scoreAreaEl.style.display = "block";
+    finalScoreAreaEl.textContent = "Final Score: " + secondsLeft;
+    clearInterval(timerInterval);
+  } else {
+    questionGenerator();
   }
 }
 
-function endGame() {
-  // quizArea.innerHTML = "";
-  var finalScreen = document.createElement("h4");
-  finalScreen.textContent = "Hey, you got this far. Congrats kid.";
-  quizArea.append(finalScreen);
+// This function checks whether or not the choice selected is correct or not. If the text content does not match as the result, time is deducted.
+function checkResult(result) {
+  if (result === arrayOfQuestions[questionIndex].answer) {
+    showResultEl.textContent = "Correct!";
+  } else {
+    showResultEl.textContent = "Wrong!";
+    secondsLeft -= 15;
+  }
 }
 
-
-// quiz.addEventListener("click", function () {
-//   questionIndex++;
-//   generateQuestion();
-// });
-
-quizArea.addEventListener("click", function (event) {
-  event.preventDefault();
-  var answers = arrayOfQuestions[questionIndex].answer
-  if (event.target.matches(".choice-button")) {
-    questionIndex++;
-    generateQuestion();
-    if (event.target.textContent !== answers) {
-      secondsLeft = secondsLeft - 10;
-      responseEl.innerHTML = "incorrect";
-      // questionIndex++;
-    } else {
-      responseEl.innerHTML = "correct";
-      // questionIndex++;
-    }
-  }
-});
+startGameEl.addEventListener("click", startGameTimer);
 
 
-// quizArea.addEventListener("click", function(event) {;
-//   if(event.target.matches("button")){;
+// scoreSubmitEl.addEventListener("click", function (event) {
+//   event.preventDefault();
+//   if (event.target.matches("#score-submit")) {
+//     savedHighScores.push({"initials":initialsEl[0].value, "score":timeLeft});
+//     console.log(savedHighScores)
+//   localStorage.setItem("highScores", JSON.stringify((savedHighScores)));
+//   questionSection.innerHTML = "";
+//   renderHighScores();
 //   }
 // });
 
-
-// function incorrectAnswer() {
-//   // cycles through buttons with the class "incorrect" and add event listners to those buttons
-//   // deduct time inside event listener
-// }
-
-    // var responseTime = setInterval(function () {
-    //   //Clear the HTML to start fresh
-    //   quizArea.innerHTML = "";
-    //   questionIndex++;
-    //   clearInterval(responseTime);
-    //   generateQuestion();
-    // }, 1000);
+// function renderHighScores(){
+//   var highScores = JSON.parse(localStorage.getItem("highScores"));
+  
+//   for (var i = 0; i < highScores.length; i++) {
+//     //create the element
+//       var highScoresMessage = document.createElement("h3");
+//       //add content
+//       highScoresMessage.textContent = highScores[i].initials + " scored " + highScores[i].score;
+//       //append to existing element
+//       questionSection.append(highScoresMessage);
+//   }
