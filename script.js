@@ -63,8 +63,6 @@ function startGameTimer() {
 // This function generates the array of questions based on which value the index is set to, which cycles on each button press. It dynamically generates the HTML elements onot the webpage.
 function questionGenerator() {
   var currentQuestionIndex = arrayOfQuestions[questionIndex];
-  console.log(arrayOfQuestions[questionIndex].question);
-  console.log(arrayOfQuestions[questionIndex].selections);
   questionEl.textContent = arrayOfQuestions[questionIndex].question;
   for (var i = 0; i < currentQuestionIndex.selections.length; i++) {
     var selectionsList = document.createElement("li");
