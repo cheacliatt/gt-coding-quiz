@@ -1,0 +1,19 @@
+.container {
+    padding-top: 50px;
+}
+
+#main-menu {
+    display: block;
+}
+
+#quiz-area {
+    display: none;
+}
+
+#result-area {
+    display: block;
+}
+
+#score-area {
+    display: none;
+}
